@@ -4,8 +4,12 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Divider
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -25,45 +29,41 @@ fun MainScreen(
     onError: (String) -> Unit
 ) {
     val state by viewModel.state.collectAsState()
-        when (val currentState = state) {
-            is MainScreenState.Init -> {
-                Box(
-                    modifier = Modifier.fillMaxSize(),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Text(text = "Use search to get list of users.")
-                }
-            }
+    when (val currentState = state) {
+        is MainScreenState.Init -> {
+            viewModel.fetchUsers()
+        }
 
-            is MainScreenState.MainSuccess -> {
-                LazyColumn(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                    items(currentState.users) { user ->
-                        ResultRow(user = user,
-                            onClick = {
-                                navController.navigate("${Screens.DETAILS.screenName}/${user.login}")
-                            },
-                            modifier = Modifier.padding(horizontal = 16.dp)
-                        )
-                    }
+        is MainScreenState.MainSuccess -> {
+            LazyColumn(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                items(currentState.users) { user ->
+                    ResultRow(
+                        user = user,
+                        onClick = {
+                            navController.navigate("${Screens.DETAILS.screenName}/${user.login}")
+                        },
+                        modifier = Modifier.padding(horizontal = 16.dp)
+                    )
                 }
-            }
-
-            is MainScreenState.Loading -> {
-                if (currentState.isLoading) {
-                    Box(
-                        modifier = Modifier.fillMaxWidth()
-                            .fillMaxHeight(),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        CircularProgressIndicator()
-                    }
-                }
-            }
-
-            is MainScreenState.Error -> {
-                onError(currentState.message)
             }
         }
+
+        is MainScreenState.Loading -> {
+            if (currentState.isLoading) {
+                Box(
+                    modifier = Modifier.fillMaxWidth()
+                        .fillMaxHeight(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    CircularProgressIndicator()
+                }
+            }
+        }
+
+        is MainScreenState.Error -> {
+            onError(currentState.message)
+        }
+    }
 }
 
 @Composable
