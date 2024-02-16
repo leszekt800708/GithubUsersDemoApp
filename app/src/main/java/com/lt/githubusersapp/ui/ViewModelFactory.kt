@@ -8,8 +8,8 @@ import com.lt.githubusersapp.di.ApiComponent
 class ViewModelFactory(private val apiComponent: ApiComponent) : ViewModelProvider.NewInstanceFactory() {
     override fun <T : ViewModel> create(modelClass: Class<T>): T =
         if (modelClass.isAssignableFrom(MainScreenViewModel::class.java)) {
-            MainScreenViewModel(apiComponent) as T
+            MainScreenViewModel(apiComponent.getUsersUseCase()) as T
         } else {
-            DetailsScreenViewModel(apiComponent) as T
+            DetailsScreenViewModel(apiComponent.getUserDetailsUseCase()) as T
         }
 }

@@ -7,14 +7,14 @@ import com.lt.githubusersapp.remote.api.UsersApi
 import javax.inject.Inject
 
 class UserRemoteDataSource @Inject constructor(
-    private val usersApi: UsersApi
+    private val usersApi: UsersApi,
 ) : UsersDataSource {
-    override suspend fun getUsers(query: String, perPage: Int, page: Int): List<User> {
-        return usersApi.getUsers(query, perPage, page).map { userApiEntity ->
+    override suspend fun getUsers(perPage: Int, startId: Int): List<User> {
+        return usersApi.getUsers(perPage = perPage, startId = startId).map {
             User(
-                id = userApiEntity.userId,
-                login = userApiEntity.login,
-                avatarUrl = userApiEntity.avatarUrl
+                id = it.userId,
+                login = it.login,
+                avatarUrl = it.avatarUrl
             )
         }
     }

@@ -49,7 +49,9 @@ fun DetailsScreen(
         is DetailsScreenState.DetailsSuccess -> {
             val userDetails: UserDetails = currentState.userDetails
             Column(
-                modifier = Modifier.fillMaxWidth().fillMaxHeight(),
+                modifier = Modifier.fillMaxWidth()
+                    .fillMaxHeight()
+                    .padding(16.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 AsyncImage(
@@ -68,7 +70,7 @@ fun DetailsScreen(
                     text = userDetails.bio,
                     modifier = Modifier.fillMaxWidth(),
                     fontSize = 20.sp,
-                    textAlign = TextAlign.Center
+                    textAlign = TextAlign.Start
                 )
                 Row(
                     horizontalArrangement = Arrangement.SpaceBetween,

@@ -3,26 +3,40 @@ package com.lt.githubusersapp.ui
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.lt.githubusersapp.di.ApiComponent
-import kotlinx.coroutines.flow.*
+import androidx.paging.PagingData
+import androidx.paging.cachedIn
+import com.lt.githubusersapp.domain.GetUsersUseCase
+import com.lt.githubusersapp.domain.User
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class MainScreenViewModel(private val apiComponent: ApiComponent): ViewModel() {
-    private val _state = MutableStateFlow<MainScreenState>(MainScreenState.Init)
-    val state: StateFlow<MainScreenState> = _state
+class MainScreenViewModel @Inject constructor(private val getUsersUseCase: GetUsersUseCase) : ViewModel() {
+    private val _usersState: MutableStateFlow<PagingData<User>> = MutableStateFlow(value = PagingData.empty())
+    val usersState: StateFlow<PagingData<User>> = _usersState
 
-   fun fetchUsers(query: String = "", perPage: Int  = 10, page: Int = 1){
-        _state.value = MainScreenState.Loading(true)
+    init {
+        fetchUsers()
+    }
+
+    private suspend fun getUsers(pageSize: Int) {
+        getUsersUseCase.getUsers(pageSize)
+            .distinctUntilChanged()
+            .cachedIn(viewModelScope)
+            .collect {
+                _usersState.value = it
+            }
+    }
+
+    fun fetchUsers() {
         viewModelScope.launch {
-            flowOf(apiComponent.getUsersUseCase().getUsers(query, perPage, page))
-                .catch { ex ->
-                    _state.value = MainScreenState.Loading(false)
-                    _state.value = MainScreenState.Error(ex.localizedMessage?: "Unknown error occurred")
-                }
-                .collect {_state.value = MainScreenState.MainSuccess(it)
-                }
+            getUsers(10)
         }
     }
 }
+
+
 
 
