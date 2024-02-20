@@ -38,7 +38,11 @@ fun MainScreen(
 ) {
     val usersPagingItems: LazyPagingItems<User> = viewModel.usersState.collectAsLazyPagingItems()
     var refreshing by remember { mutableStateOf(false) }
-    val state = rememberPullRefreshState(refreshing, { usersPagingItems.refresh() })
+    val state = rememberPullRefreshState(refreshing, {
+        refreshing = true
+        usersPagingItems.refresh()
+        refreshing = false
+    })
     Box(Modifier.pullRefresh(state)) {
         LazyColumn {
             items(usersPagingItems.itemCount) {
