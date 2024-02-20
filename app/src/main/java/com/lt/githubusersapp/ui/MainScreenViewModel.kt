@@ -21,8 +21,8 @@ class MainScreenViewModel @Inject constructor(private val getUsersUseCase: GetUs
         fetchUsers()
     }
 
-    private suspend fun getUsers(pageSize: Int) {
-        getUsersUseCase.getUsers(pageSize)
+    private suspend fun getUsers() {
+        getUsersUseCase.getUsers()
             .distinctUntilChanged()
             .cachedIn(viewModelScope)
             .collect {
@@ -32,7 +32,7 @@ class MainScreenViewModel @Inject constructor(private val getUsersUseCase: GetUs
 
     fun fetchUsers() {
         viewModelScope.launch {
-            getUsers(10)
+            getUsers()
         }
     }
 }

@@ -1,28 +1,42 @@
 package com.lt.githubusersapp.data
 
-import androidx.paging.Pager
-import androidx.paging.PagingConfig
-import androidx.paging.PagingData
+import androidx.paging.*
+import com.lt.githubusersapp.data.datastore.UserDetailsDataStore
+import com.lt.githubusersapp.data.datastore.UsersPagedDataStore
+import com.lt.githubusersapp.data.local.UserDatabase
+import com.lt.githubusersapp.data.mappers.toUser
+import com.lt.githubusersapp.data.mappers.toUserDetails
 import com.lt.githubusersapp.domain.User
 import com.lt.githubusersapp.domain.UserDetails
 import com.lt.githubusersapp.domain.UsersRepository
-import com.lt.githubusersapp.remote.datasource.GithubUsersPagingSource
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 import javax.inject.Inject
+import javax.inject.Named
 
 class GithubUsersRepository @Inject constructor(
-    private val usersDataSource: UsersDataSource
+    usersPagedDataStore: UsersPagedDataStore,
+    @Named("PAGE_SIZE") pageSize: Int,
+    private val userDatabase: UserDatabase,
+    private val userDetailsDataStore: UserDetailsDataStore
 ) : UsersRepository {
-    override suspend fun getUsers(perPage: Int): Flow<PagingData<User>> {
-        return Pager(
-            config = PagingConfig(pageSize = perPage, initialLoadSize = perPage),
-            pagingSourceFactory = {
-                GithubUsersPagingSource(usersDataSource)
-            }
-        ).flow
+    @OptIn(ExperimentalPagingApi::class)
+    private val pager: Pager<Int, UserEntity> = Pager(
+        config = PagingConfig(
+            pageSize = pageSize,
+            initialLoadSize = pageSize
+        ),
+        remoteMediator = usersPagedDataStore,
+        pagingSourceFactory = { userDatabase.dao.pagingSource() }
+    )
+
+    override suspend fun getUsers(): Flow<PagingData<User>> {
+        return pager.flow.map { pagingData ->
+            pagingData.map { it.toUser() }
+        }
     }
 
     override suspend fun getUserDetails(login: String): UserDetails {
-        return usersDataSource.getUser(login)
+        return userDetailsDataStore.getUserDetails(login).toUserDetails()
     }
 }

@@ -5,11 +5,10 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
@@ -17,23 +16,28 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import com.lt.githubusersapp.di.DaggerApiComponent
+import com.lt.githubusersapp.di.AppComponent
 import com.lt.githubusersapp.ui.DetailsScreen
 import com.lt.githubusersapp.ui.MainScreen
 import com.lt.githubusersapp.ui.ViewModelFactory
 import com.lt.githubusersapp.ui.theme.GithubUsersAppTheme
 import kotlinx.coroutines.launch
 
+val LocalAppComponent = staticCompositionLocalOf<AppComponent> {
+    error("No Dagger Application Component found!")
+}
+
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val apiComponent = DaggerApiComponent.builder()
-            .baseUrl("https://api.github.com/")
-            .build()
-        val factory = ViewModelFactory(apiComponent)
+        val appComponent = (applicationContext as GithubUsersApplication).appComponent
+        val factory = ViewModelFactory(appComponent)
         setContent {
-            GithubUsersAppTheme {
-                GithubUsersApp(factory)
+            CompositionLocalProvider(LocalAppComponent provides appComponent)
+            {
+                GithubUsersAppTheme {
+                    GithubUsersApp(factory)
+                }
             }
         }
     }
@@ -55,12 +59,12 @@ fun GithubUsersApp(factory: ViewModelFactory) {
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text(text = "Github Users App", textAlign = TextAlign.Center) },
+                title = { Text(text = stringResource(R.string.app_title), textAlign = TextAlign.Center) },
                 navigationIcon = {
                     val backStackEntry by navController.currentBackStackEntryAsState()
                     if (backStackEntry != null && navController.previousBackStackEntry != null) {
                         IconButton(onClick = { navController.navigateUp() }) {
-                            Icon(Icons.Default.ArrowBack, contentDescription = "Back")
+                            Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
                         }
                     }
                 },
@@ -86,12 +90,10 @@ fun GithubUsersNavHost(
 ) {
 
 
-
     NavHost(navController = navController, startDestination = Screens.MAIN.screenName, modifier = modifier) {
         composable(Screens.MAIN.screenName) {
             MainScreen(
                 viewModel = viewModel(factory = factory),
-                onError = onError,
                 navController = navController
             )
         }
@@ -100,8 +102,7 @@ fun GithubUsersNavHost(
             DetailsScreen(
                 login = login,
                 viewModel = viewModel(factory = factory),
-                onError = onError,
-                navController = navController
+                onError = onError
             )
         }
     }

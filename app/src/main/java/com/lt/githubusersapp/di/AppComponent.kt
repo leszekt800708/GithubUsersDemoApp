@@ -1,5 +1,7 @@
 package com.lt.githubusersapp.di
 
+import android.content.Context
+import com.lt.githubusersapp.GithubUsersApplication
 import com.lt.githubusersapp.domain.GetUserDetailsUseCase
 import com.lt.githubusersapp.domain.GetUsersUseCase
 import dagger.BindsInstance
@@ -10,11 +12,15 @@ import javax.inject.Named
     modules = [
         NetworkModule::class,
         UsersDataSourceModule::class,
-        UsersRepositoryModule::class
+        UsersRepositoryModule::class,
+        DatabaseModule::class,
+        UsersPagedDataStoreModule::class
     ]
 )
 @ApplicationScope
-interface ApiComponent {
+interface AppComponent {
+
+    fun inject(application: GithubUsersApplication)
     fun getUsersUseCase(): GetUsersUseCase
     fun getUserDetailsUseCase(): GetUserDetailsUseCase
 
@@ -22,6 +28,12 @@ interface ApiComponent {
     interface Builder {
         @BindsInstance
         fun baseUrl(@Named("BASE_URL") baseUrl: String): Builder
-        fun build(): ApiComponent
+
+        @BindsInstance
+        fun pageSize(@Named("PAGE_SIZE") pageSize: Int): Builder
+
+        @BindsInstance
+        fun context(applicationContext: Context): Builder
+        fun build(): AppComponent
     }
 }

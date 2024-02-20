@@ -1,3 +1,10 @@
 <resources>
     <string name="app_name">GithubUsersApp</string>
+    <string name="app_title">Github Users App</string>
+    <string name="empty_bio">No Bio information is available</string>
+    <string name="public_repos">Public Repos</string>
+    <string name="followers">Followers</string>
+    <string name="following">Following</string>
+    <string name="unknown_error">Unknown error</string>
+    <string name="error_loading_data">Error loading data</string>
 </resources>

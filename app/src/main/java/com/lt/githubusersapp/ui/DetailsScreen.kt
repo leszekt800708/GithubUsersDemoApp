@@ -10,18 +10,18 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.navigation.NavController
 import coil.compose.AsyncImage
+import com.lt.githubusersapp.R
 import com.lt.githubusersapp.domain.UserDetails
 
 @Composable
 fun DetailsScreen(
     login: String,
     viewModel: DetailsScreenViewModel,
-    navController: NavController,
     onError: (String) -> Unit
 ) {
     val state by viewModel.state.collectAsState()
@@ -67,7 +67,7 @@ fun DetailsScreen(
                     textAlign = TextAlign.Center
                 )
                 Text(
-                    text = userDetails.bio,
+                    text = userDetails.bio ?: stringResource(R.string.empty_bio),
                     modifier = Modifier.fillMaxWidth(),
                     fontSize = 20.sp,
                     textAlign = TextAlign.Start
@@ -83,7 +83,7 @@ fun DetailsScreen(
                             textAlign = TextAlign.Center
                         )
                         Text(
-                            text = "Public Repos",
+                            text = stringResource(R.string.public_repos),
                             fontSize = 16.sp,
                             textAlign = TextAlign.Center
                         )
@@ -95,7 +95,7 @@ fun DetailsScreen(
                             textAlign = TextAlign.Center
                         )
                         Text(
-                            text = "Followers",
+                            text = stringResource(R.string.followers),
                             fontSize = 16.sp,
                             textAlign = TextAlign.Center
                         )
@@ -107,7 +107,7 @@ fun DetailsScreen(
                             textAlign = TextAlign.Center
                         )
                         Text(
-                            text = "Following",
+                            text = stringResource(R.string.following),
                             fontSize = 16.sp,
                             textAlign = TextAlign.Center
                         )

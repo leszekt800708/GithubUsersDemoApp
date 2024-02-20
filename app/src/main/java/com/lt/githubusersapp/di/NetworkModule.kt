@@ -39,7 +39,7 @@ class NetworkModule {
                 .newBuilder()
                 .header("Accept", "application/vnd.github+json")
                 .header("X-GitHub-Api-Version", "2022-11-28")
-                .header("User-Agent", "githubusersapp")
+                .header("User-Agent", "androidgithubusersapp")
 
             val newRequest = requestBuilder.build()
             it.proceed(newRequest)
