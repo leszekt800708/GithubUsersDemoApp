@@ -42,7 +42,9 @@ fun MainScreen(
     Box(Modifier.pullRefresh(state)) {
         LazyColumn {
             items(usersPagingItems.itemCount) {
+                println("BROKOLI: usersPagingItems.itemCount: ${usersPagingItems.itemCount}")
                 val user = usersPagingItems[it]
+                println("BROKOLI: user: $user")
                 if (user != null) {
                     ResultRow(
                         user = user,
@@ -105,10 +107,12 @@ fun ResultRow(user: User, onClick: (String) -> Unit, modifier: Modifier = Modifi
         onClick(user.login)
     }) {
         AsyncImage(
-            modifier = Modifier.height(60.dp),
+            modifier = Modifier.height(60.dp).width(60.dp),
             model = user.avatarUrl,
             contentDescription = null,
-            placeholder = painterResource(R.drawable.baseline_person_24)
+            placeholder = painterResource(R.drawable.baseline_person_24),
+            fallback = painterResource(R.drawable.baseline_person_24),
+            error = painterResource(R.drawable.baseline_person_24)
 
         )
         Text(
